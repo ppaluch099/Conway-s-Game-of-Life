@@ -1,0 +1,21 @@
+﻿@model Conway.Models.Population
+@{
+    var grid = ViewData["grid"] as int[,];
+}
+
+
+@for (var i = 0; i < grid.GetLength(0); i++)
+{
+    <div style="display: table-row">
+    @for (var j = 0; j < grid.GetLength(1); j++)
+    {
+            if (grid[i, j] == 1)
+            {
+                <div data-x="@i" data-y="@j" class="alive"></div>
+            } else
+            {
+                <div data-x="@i" data-y="@j" class="dead"></div>
+            }
+        }
+    </div>
+}

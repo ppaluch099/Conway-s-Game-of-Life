@@ -1,0 +1,64 @@
+﻿@{
+    ViewData["Title"] = "Game of Life";
+}
+
+<div id="container" class="text-center w-100">
+    @{
+        Html.RenderPartial("_Grid");
+    }
+</div>
+<br />
+<button type="button" class="btn btn-primary" id="start">
+    <span class="glyphicon glyphicon-play"></span>
+</button>
+<button type="button" class="btn btn-primary" id="pause" disabled>
+    <span class="glyphicon glyphicon-pause"></span>
+</button>
+<button type="button" class="btn btn-primary" id="restart">
+    <span class="glyphicon glyphicon-repeat"></span>
+</button>
+
+<script>
+    var interval;
+    const aliveIndices = new Set();
+    $('body').on('click', 'div.dead', function() {
+        $(this).addClass("alive");
+        $(this).removeClass("dead");
+        aliveIndices.add({x: $(this).data("x"), y: $(this).data("y")});
+    })
+    $('body').on('click', 'div.alive', function() {
+        $(this).addClass("dead");
+        $(this).removeClass("alive");
+        aliveIndices.forEach(x => x.x == $(this).data("x") && x.y == $(this).data("y") ? aliveIndices.delete(x) : x);
+    })
+    
+    $('#start').on('click', function() {
+        play();
+        $(this).attr('disabled', true);
+        $("#pause").attr('disabled', false);
+        interval = setInterval(play, 1500);
+    })
+
+    $('#pause').on('click', function() {
+        clearInterval(interval);
+        $(this).attr('disabled', true);
+        $("#start").attr('disabled', false);
+    })
+
+    $('#restart').on('click', function() {
+        location.href = "@Url.Action("Index")";
+    })
+
+    function play() {
+        $.ajax({
+            url: "@Url.Action("Game", "Home")",
+            data: { start: JSON.stringify([...aliveIndices])},
+            type: "post",
+            dataType: "html",
+            async: true,
+            cache: false
+        }).done(function (result) {
+            $("#container").html(result);
+        });
+    }
+</script>
